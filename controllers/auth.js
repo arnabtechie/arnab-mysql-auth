@@ -24,7 +24,7 @@ exports.signup = async (req, res) => {
     }
 
     try {
-        const [user, schema] = await db.query('select id from users where email = ?', email);
+        const [user] = await db.query('select id from users where email = ?', email);
         if (user && user[0]) {
             return res.status(400).send({
                 status: 'fail',
@@ -68,7 +68,7 @@ exports.login = async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        const [user, schema] = await db.query('select id, email, full_name, password from users where email = ?', email);
+        const [user] = await db.query('select id, email, full_name, password from users where email = ?', email);
 
         if (!user || (user && !user[0])) {
             return res.status(400).send({
@@ -107,7 +107,7 @@ exports.logout = async (req, res) => {
 };
 
 exports.profile = async (req, res) => {
-    const [user, schema] = await db.query('select id, email, full_name, created_at from users where id = ?', req.user.id);
+    const [user] = await db.query('select id, email, full_name, created_at from users where id = ?', req.user.id);
     if (user && user[0]) {
         return res.status(200).json({ status: 'success', data: user[0] });
     }
