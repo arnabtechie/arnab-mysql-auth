@@ -17,8 +17,8 @@ exports.signup = async (req, res) => {
     const { email, password, full_name } = req.body;
 
     try {
-        const user = await db.query('select id from users where email = ?', email);
-        if (user && user [0] && user [0].length > 0) {
+        const [user, schema] = await db.query('select id from users where email = ?', email);
+        if (user && user[0]) {
             return res.status(400).send({
                 status: 'fail',
                 message: 'user exists, try logging in'
