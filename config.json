@@ -1,0 +1,11 @@
+{
+    "PORT": 3000,
+    "JWT_SECRET": "any-random-string",
+    "DB": {
+        "HOST": "localhost",
+        "PORT": "3306",
+        "DATABASE_NAME": "node_test",
+        "USERNAME": "root",
+        "PASSWORD": "root"
+    }
+}
