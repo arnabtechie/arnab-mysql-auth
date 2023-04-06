@@ -1,8 +1,54 @@
 const express = require('express');
 const { check } = require('express-validator');
 const auth = require('../controllers/auth.js');
+const jwt = require('jsonwebtoken');
+const config = require('../config');
+const db = require('../db');
 
 const router = express.Router();
+
+const protect = async (req, res, next) => {
+    let token;
+    if (req.headers && req.headers.authorization &&
+        req.headers.authorization.startsWith('Bearer')) {
+      token = req.headers.authorization.split(' ')[1];
+    } else if (req.headers && req.headers.authorization) {
+        token = req.headers.authorization;
+    }
+
+    if (!token) {
+      return res.status(401).send({
+        status: 'fail',
+        error: 'you are not logged in! please log in to get access',
+      });
+    }
+
+    try {
+        const decoded = jwt.verify(token, config.JWT_SECRET);
+    
+        if (!decoded) {
+            return res.status(401).send({
+                status: 'fail',
+                error: 'unauthorized',
+            });
+        }
+    
+        const [user, schema] = await db.query('select id, email, full_name from users where id = ?', decoded.id);
+    
+        if (!user || (user && !user[0])) {
+          return res.status(401).send({
+            status: 'fail',
+            message: 'user belonging to this token does no longer exist',
+          });
+        }
+    
+        req.user = user[0];
+        res.locals.user = user[0];
+        next();
+    } catch (err) {
+        return res.status(500).send({ status: 'fail', error: err.toString() });
+    }
+};
 
 // ------------------------------Unauthenticated---------------------------//
 router.post(
@@ -25,7 +71,7 @@ router.post(
 
 // ----------------------------------------------------------------------//
 
-router.use(auth.protect);
+router.use(protect);
 
 // ------------------------------Authenticated---------------------------//
 router.get('/users/logout', auth.logout);

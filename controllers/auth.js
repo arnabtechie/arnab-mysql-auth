@@ -1,4 +1,3 @@
-const jwt = require('jsonwebtoken');
 const db = require('../db');
 const config = require('../config');
 const bcrypt = require('bcrypt');
@@ -108,47 +107,4 @@ exports.profile = async (req, res) => {
         status: 'fail',
         message: 'invalid id'
     });
-};
-
-exports.protect = async (req, res, next) => {
-    let token;
-    if (req.headers && req.headers.authorization &&
-        req.headers.authorization.startsWith('Bearer')) {
-      token = req.headers.authorization.split(' ')[1];
-    } else if (req.headers && req.headers.authorization) {
-        token = req.headers.authorization;
-    }
-
-    if (!token) {
-      return res.status(401).send({
-        status: 'fail',
-        error: 'you are not logged in! please log in to get access',
-      });
-    }
-
-    try {
-        const decoded = jwt.verify(token, config.JWT_SECRET);
-    
-        if (!decoded) {
-            return res.status(401).send({
-                status: 'fail',
-                error: 'unauthorized',
-            });
-        }
-    
-        const [user, schema] = await db.query('select id, email, full_name from users where id = ?', decoded.id);
-    
-        if (!user || (user && !user[0])) {
-          return res.status(401).send({
-            status: 'fail',
-            message: 'user belonging to this token does no longer exist',
-          });
-        }
-    
-        req.user = user[0];
-        res.locals.user = user[0];
-        next();
-    } catch (err) {
-        return res.status(500).send({ status: 'fail', error: err.toString() });
-    }
 };
