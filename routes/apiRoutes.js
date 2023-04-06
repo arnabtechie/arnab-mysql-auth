@@ -14,7 +14,7 @@ router.post(
   ],
   auth.signup,
 );
-router.post(// ------------------------------Authenticated---------------------------//
+router.post(
   '/users/login',
   [
     check('email', 'Please enter valid email').isEmail(),
