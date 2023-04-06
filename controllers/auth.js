@@ -106,7 +106,7 @@ exports.logout = async (req, res) => {
 };
 
 exports.profile = async (req, res) => {
-    const [user, schema] = await db.query('select id, email, full_name from users where id = ?', req.user.id);
+    const [user, schema] = await db.query('select id, email, full_name, created_at from users where id = ?', req.user.id);
     if (user && user[0]) {
         return res.status(200).json({ status: 'success', data: user[0] });
     }
