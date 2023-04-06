@@ -29,6 +29,7 @@ router.use(auth.protect);
 
 // ------------------------------Authenticated---------------------------//
 router.get('/users/logout', auth.logout);
+router.get('/users/me', auth.profile);
 
 // ---------------------------------------------------------------------//
 

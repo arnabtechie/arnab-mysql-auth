@@ -99,6 +99,17 @@ exports.logout = async (req, res) => {
     return res.status(200).json({ status: 'success' });
 };
 
+exports.profile = async (req, res) => {
+    const [user, schema] = await db.query('select id, email, full_name from users where id = ?', req.user.id);
+    if (user && user[0]) {
+        return res.status(200).json({ status: 'success', data: user[0] });
+    }
+    return res.status(400).send({
+        status: 'fail',
+        message: 'invalid id'
+    });
+};
+
 exports.protect = async (req, res, next) => {
     let token;
     if (req.headers && req.headers.authorization &&
