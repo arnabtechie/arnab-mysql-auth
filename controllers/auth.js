@@ -13,7 +13,14 @@ exports.signup = async (req, res) => {
       });
     }
 
-    const { email, password, full_name } = req.body;
+    const { email, password, full_name, confirmPassword } = req.body;
+
+    if (confirmPassword !== password) {
+        return res.status(400).send({
+            status: 'fail',
+            message: 'password and confirmPassword are different'
+        });
+    }
 
     try {
         const [user, schema] = await db.query('select id from users where email = ?', email);

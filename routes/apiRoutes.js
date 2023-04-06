@@ -57,6 +57,7 @@ router.post(
     check('full_name', 'Please enter name.').not().isEmpty(),
     check('email', 'Please enter valid email').isEmail(),
     check('password', 'Please enter valid password').isLength({ min: 4 }),
+    check('confirmPassword', 'Please enter valid confirmPassword').isLength({ min: 4 }),
   ],
   auth.signup,
 );
