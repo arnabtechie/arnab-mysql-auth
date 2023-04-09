@@ -33,7 +33,7 @@ const protect = async (req, res, next) => {
             });
         }
     
-        const [user, schema] = await db.query('select id, email, full_name from users where id = ?', decoded.id);
+        const [user] = await db.query('select id, email, full_name from users where id = ?', decoded.id);
     
         if (!user || (user && !user[0])) {
           return res.status(401).send({

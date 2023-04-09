@@ -15,7 +15,7 @@ pool.getConnection()
     console.log('database connected');
     connection.release();
   })
-  .catch(error => console.log('Error acquiring connection:', error));
+  .catch(error => console.log('error acquiring connection:', error));
 
 
 module.exports = pool;

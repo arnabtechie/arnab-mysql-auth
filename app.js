@@ -1,5 +1,4 @@
 const express = require('express');
-const config = require('./config.json');
 const morgan = require('morgan');
 const cors = require('cors');
 const http = require('http');
