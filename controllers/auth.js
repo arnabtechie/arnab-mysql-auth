@@ -14,7 +14,7 @@ exports.signup = async (req, res) => {
       });
     }
 
-    const { email, password, full_name, confirmPassword } = req.body;
+    const { email, password, fullName, confirmPassword } = req.body;
 
     if (confirmPassword !== password) {
         return res.status(400).send({
@@ -34,7 +34,7 @@ exports.signup = async (req, res) => {
 
         const hashPassword = await bcrypt.hash(password, 12);
 
-        const result = await db.query('insert into users (email, full_name, password) values (?, ?, ?)', [email, full_name, hashPassword]);
+        const result = await db.query('insert into users (email, full_name, password) values (?, ?, ?)', [email, fullName, hashPassword]);
         if (result && result[0]) {
             const token = jwt.sign({ id: result[0].insertId }, config.JWT_SECRET, {
                 expiresIn: 86400 * 30
