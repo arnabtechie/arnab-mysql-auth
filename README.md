@@ -1,5 +1,3 @@
-Sure! Here is an example README file for a Node.js project that uses a MySQL database:
-
 # Node.js + MySQL
 
 A brief description of the project.
