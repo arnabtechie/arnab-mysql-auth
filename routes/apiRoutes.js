@@ -54,7 +54,7 @@ const protect = async (req, res, next) => {
 router.post(
   '/users/signup',
   [
-    check('full_name', 'Please enter name.').not().isEmpty(),
+    check('fullName', 'Please enter name.').not().isEmpty(),
     check('email', 'Please enter valid email').isEmail(),
     check('password', 'Please enter valid password').isLength({ min: 4 }),
     check('confirmPassword', 'Please enter valid confirmPassword').isLength({ min: 4 }),
