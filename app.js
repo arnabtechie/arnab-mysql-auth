@@ -7,7 +7,7 @@ const apiRoutes = require('./routes/apiRoutes');
 
 const app = express();
 
-app.get('/', (req, res) => res.status(200).send({ status: 'success' }));
+app.get('/', (req, res) => res.status(200).send({ message: 'success' }));
 
 const server = http.createServer(app);
 
