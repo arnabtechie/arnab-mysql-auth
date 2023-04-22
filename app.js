@@ -18,8 +18,7 @@ app.use(express.json());
 app.use('/api', apiRoutes);
 
 app.use((_, res) => res.status(404).send({
-    status: 'fail',
-    errors: '404 not found',
+    error: '404 route not found',
 }));
 
 module.exports = server;

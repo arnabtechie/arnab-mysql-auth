@@ -9,7 +9,6 @@ exports.signup = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).send({
-        status: 'fail',
         error: errors,
       });
     }
@@ -18,8 +17,7 @@ exports.signup = async (req, res) => {
 
     if (confirmPassword !== password) {
         return res.status(400).send({
-            status: 'fail',
-            message: 'password and confirmPassword are different'
+            error: 'Password and Confirm Password are different'
         });
     }
 
@@ -27,8 +25,7 @@ exports.signup = async (req, res) => {
         const [user] = await db.query('select id from users where email = ?', email);
         if (user && user[0]) {
             return res.status(400).send({
-                status: 'fail',
-                message: 'user exists, try logging in'
+                error: 'User exists, try logging in'
             });
         }
 
@@ -41,19 +38,16 @@ exports.signup = async (req, res) => {
             });
 
             return res.status(201).send({
-                status: 'success',
-                message: 'user added successfully',
-                data: {
-                    id: result[0].insertId,
-                    token
-                }
+                message: 'User registered successfully',
+                id: result[0].insertId,
+                token
             });
         }
 
-        return res.status(400).send({ status: 'fail', error: 'something went wrong' })
+        return res.status(400).send({ error: 'Something went wrong' })
 
     } catch (err) {
-        return res.status(500).send({ status: 'fail', error: err.toString() });
+        return res.status(500).send({ error: err.toString() });
     }
 };
 
@@ -61,7 +55,6 @@ exports.login = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).send({
-        status: 'fail',
         error: errors,
       });
     }
@@ -72,8 +65,7 @@ exports.login = async (req, res) => {
 
         if (!user || (user && !user[0])) {
             return res.status(400).send({
-                status: 'fail',
-                message: 'invalid credentials'
+                error: 'Invalid credentials'
             });
         }
     
@@ -81,38 +73,34 @@ exports.login = async (req, res) => {
     
         if (!isMatch) {
             return res.status(400).send({
-                status: 'fail',
-                message: 'invalid credentials'
+                error: 'Invalid credentials'
             });
         }
     
         const token = jwt.sign({ id: user[0].id }, config.JWT_SECRET);
     
         return res.status(200).send({
-            status: 'success',
-            data: {
-                id: user[0].id,
-                full_name: user[0].full_name,
-                email: user[0].email,
-                token
-            }
+            message: 'User logged in successfully',
+            id: user[0].id,
+            full_name: user[0].full_name,
+            email: user[0].email,
+            token
         });
     } catch (err) {
-        return res.status(500).send({ status: 'fail', error: err.toString() });
+        return res.status(500).send({ error: err.toString() });
     }
 };
 
 exports.logout = async (req, res) => {
-    return res.status(200).json({ status: 'success' });
+    return res.send(200).send({ message: 'User logged out successfully' });
 };
 
 exports.profile = async (req, res) => {
     const [user] = await db.query('select id, email, full_name, created_at from users where id = ?', req.user.id);
     if (user && user[0]) {
-        return res.status(200).json({ status: 'success', data: user[0] });
+        return res.status(200).json({ ...user[0] });
     }
     return res.status(400).send({
-        status: 'fail',
-        message: 'invalid id'
+        error: 'Invalid user'
     });
 };

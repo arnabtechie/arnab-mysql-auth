@@ -18,8 +18,7 @@ const protect = async (req, res, next) => {
 
     if (!token) {
       return res.status(401).send({
-        status: 'fail',
-        error: 'you are not logged in! please log in to get access',
+        error: 'You are not logged in! please log in to get access',
       });
     }
 
@@ -28,8 +27,7 @@ const protect = async (req, res, next) => {
     
         if (!decoded) {
             return res.status(401).send({
-                status: 'fail',
-                error: 'unauthorized',
+              error: 'Unauthorized',
             });
         }
     
@@ -37,8 +35,7 @@ const protect = async (req, res, next) => {
     
         if (!user || (user && !user[0])) {
           return res.status(401).send({
-            status: 'fail',
-            message: 'user belonging to this token does no longer exist',
+            error: 'User belonging to this token does no longer exist',
           });
         }
     
@@ -46,7 +43,7 @@ const protect = async (req, res, next) => {
         res.locals.user = user[0];
         next();
     } catch (err) {
-        return res.status(500).send({ status: 'fail', error: err.toString() });
+        return res.status(401).send({ error: err.toString() });
     }
 };
 
