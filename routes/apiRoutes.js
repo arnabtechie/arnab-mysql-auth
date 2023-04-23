@@ -73,7 +73,8 @@ router.use(protect);
 
 // ------------------------------Authenticated---------------------------//
 router.get('/users/logout', auth.logout);
-router.get('/users/me', auth.profile);
+router.get('/users/me', auth.user);
+router.get('/users/user', auth.profile);
 
 // ---------------------------------------------------------------------//
 

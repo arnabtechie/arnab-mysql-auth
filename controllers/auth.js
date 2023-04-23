@@ -95,6 +95,16 @@ exports.logout = async (req, res) => {
     return res.send(200).send({ message: 'User logged out successfully' });
 };
 
+exports.user = async (req, res) => {
+    const [user] = await db.query('select id, email, full_name, created_at from users where id = ?', req.user.id);
+    if (user && user[0]) {
+        return res.status(200).json({ ...user[0] });
+    }
+    return res.status(400).send({
+        error: 'Invalid user'
+    });
+};
+
 exports.profile = async (req, res) => {
     const [user] = await db.query('select id, email, full_name, created_at from users where id = ?', req.user.id);
     if (user && user[0]) {
