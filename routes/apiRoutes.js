@@ -1,9 +1,9 @@
-const express = require("express");
-const { check } = require("express-validator");
-const auth = require("../controllers/auth.js");
-const jwt = require("jsonwebtoken");
-const config = require("../config");
-const db = require("../db");
+const express = require('express');
+const { check } = require('express-validator');
+const auth = require('../controllers/auth.js');
+const jwt = require('jsonwebtoken');
+const config = require('../config');
+const db = require('../db');
 
 const router = express.Router();
 
@@ -12,16 +12,16 @@ const protect = async (req, res, next) => {
   if (
     req.headers &&
     req.headers.authorization &&
-    req.headers.authorization.startsWith("Bearer")
+    req.headers.authorization.startsWith('Bearer')
   ) {
-    token = req.headers.authorization.split(" ")[1];
+    token = req.headers.authorization.split(' ')[1];
   } else if (req.headers && req.headers.authorization) {
     token = req.headers.authorization;
   }
 
   if (!token) {
     return res.status(401).send({
-      error: "You are not logged in! please log in to get access",
+      error: 'You are not logged in! please log in to get access',
     });
   }
 
@@ -30,18 +30,18 @@ const protect = async (req, res, next) => {
 
     if (!decoded) {
       return res.status(401).send({
-        error: "Unauthorized",
+        error: 'Unauthorized',
       });
     }
 
     const [user] = await db.query(
-      "select id, email, full_name from users where id = ?",
+      'select id, email, full_name from users where id = ?',
       decoded.id
     );
 
     if (!user || (user && !user[0])) {
       return res.status(401).send({
-        error: "User belonging to this token does no longer exist",
+        error: 'User belonging to this token does no longer exist',
       });
     }
 
@@ -55,22 +55,22 @@ const protect = async (req, res, next) => {
 
 // ------------------------------Unauthenticated---------------------------//
 router.post(
-  "/users/signup",
+  '/users/signup',
   [
-    check("fullName", "Please enter name.").not().isEmpty(),
-    check("email", "Please enter valid email").isEmail(),
-    check("password", "Please enter valid password").isLength({ min: 4 }),
-    check("confirmPassword", "Please enter valid confirmPassword").isLength({
+    check('fullName', 'Please enter name.').not().isEmpty(),
+    check('email', 'Please enter valid email').isEmail(),
+    check('password', 'Please enter valid password').isLength({ min: 4 }),
+    check('confirmPassword', 'Please enter valid confirmPassword').isLength({
       min: 4,
     }),
   ],
   auth.signup
 );
 router.post(
-  "/users/login",
+  '/users/login',
   [
-    check("email", "Please enter valid email").isEmail(),
-    check("password", "Please enter valid password").isLength({ min: 4 }),
+    check('email', 'Please enter valid email').isEmail(),
+    check('password', 'Please enter valid password').isLength({ min: 4 }),
   ],
   auth.login
 );
@@ -80,9 +80,9 @@ router.post(
 router.use(protect);
 
 // ------------------------------Authenticated---------------------------//
-router.get("/users/logout", auth.logout);
-router.get("/users/me", auth.user);
-router.get("/users/user", auth.profile);
+router.get('/users/logout', auth.logout);
+router.get('/users/me', auth.user);
+router.get('/users/user', auth.profile);
 
 // ---------------------------------------------------------------------//
 

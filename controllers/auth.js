@@ -1,8 +1,8 @@
-const db = require("../db");
-const jwt = require("jsonwebtoken");
-const config = require("../config");
-const bcrypt = require("bcrypt");
-const { validationResult } = require("express-validator");
+const db = require('../db');
+const jwt = require('jsonwebtoken');
+const config = require('../config');
+const bcrypt = require('bcrypt');
+const { validationResult } = require('express-validator');
 
 exports.signup = async (req, res) => {
   const errors = validationResult(req);
@@ -16,25 +16,25 @@ exports.signup = async (req, res) => {
 
   if (confirmPassword !== password) {
     return res.status(400).send({
-      error: "Password and Confirm Password are different",
+      error: 'Password and Confirm Password are different',
     });
   }
 
   try {
     const [user] = await db.query(
-      "select id from users where email = ?",
+      'select id from users where email = ?',
       email
     );
     if (user && user[0]) {
       return res.status(400).send({
-        error: "User exists, try logging in",
+        error: 'User exists, try logging in',
       });
     }
 
     const hashPassword = await bcrypt.hash(password, 12);
 
     const result = await db.query(
-      "insert into users (email, full_name, password) values (?, ?, ?)",
+      'insert into users (email, full_name, password) values (?, ?, ?)',
       [email, fullName, hashPassword]
     );
     if (result && result[0]) {
@@ -43,13 +43,13 @@ exports.signup = async (req, res) => {
       });
 
       return res.status(201).send({
-        message: "User registered successfully",
+        message: 'User registered successfully',
         id: result[0].insertId,
         token,
       });
     }
 
-    return res.status(400).send({ error: "Something went wrong" });
+    return res.status(400).send({ error: 'Something went wrong' });
   } catch (err) {
     return res.status(500).send({ error: err.toString() });
   }
@@ -66,13 +66,13 @@ exports.login = async (req, res) => {
 
   try {
     const [user] = await db.query(
-      "select id, email, full_name, password from users where email = ?",
+      'select id, email, full_name, password from users where email = ?',
       email
     );
 
     if (!user || (user && !user[0])) {
       return res.status(400).send({
-        error: "Invalid credentials",
+        error: 'Invalid credentials',
       });
     }
 
@@ -80,14 +80,14 @@ exports.login = async (req, res) => {
 
     if (!isMatch) {
       return res.status(400).send({
-        error: "Invalid credentials",
+        error: 'Invalid credentials',
       });
     }
 
     const token = jwt.sign({ id: user[0].id }, config.JWT_SECRET);
 
     return res.status(200).send({
-      message: "User logged in successfully",
+      message: 'User logged in successfully',
       id: user[0].id,
       full_name: user[0].full_name,
       email: user[0].email,
@@ -99,31 +99,31 @@ exports.login = async (req, res) => {
 };
 
 exports.logout = async (req, res) => {
-  return res.send(200).send({ message: "User logged out successfully" });
+  return res.send(200).send({ message: 'User logged out successfully' });
 };
 
 exports.user = async (req, res) => {
   const [user] = await db.query(
-    "select id, email, full_name, created_at from users where id = ?",
+    'select id, email, full_name, created_at from users where id = ?',
     req.user.id
   );
   if (user && user[0]) {
     return res.status(200).json({ ...user[0] });
   }
   return res.status(400).send({
-    error: "Invalid user",
+    error: 'Invalid user',
   });
 };
 
 exports.profile = async (req, res) => {
   const [user] = await db.query(
-    "select id, email, full_name, created_at from users where id = ?",
+    'select id, email, full_name, created_at from users where id = ?',
     req.user.id
   );
   if (user && user[0]) {
     return res.status(200).json({ ...user[0] });
   }
   return res.status(400).send({
-    error: "Invalid user",
+    error: 'Invalid user',
   });
 };
