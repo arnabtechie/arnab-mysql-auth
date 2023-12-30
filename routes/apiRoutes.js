@@ -25,6 +25,8 @@ const protect = async (req, res, next) => {
     });
   }
 
+  const connection = await db.getConnection();
+
   try {
     const decoded = jwt.verify(token, config.JWT_SECRET);
 
@@ -34,10 +36,12 @@ const protect = async (req, res, next) => {
       });
     }
 
-    const [user] = await db.query(
+    const [user] = await connection.query(
       'select id, email, full_name from users where id = ?',
       decoded.id
     );
+
+    connection.release();
 
     if (!user || (user && !user[0])) {
       return res.status(401).send({
@@ -49,6 +53,7 @@ const protect = async (req, res, next) => {
     res.locals.user = user[0];
     next();
   } catch (err) {
+    connection.release();
     return res.status(401).send({ error: err.toString() });
   }
 };

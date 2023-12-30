@@ -20,8 +20,10 @@ exports.signup = async (req, res) => {
     });
   }
 
+  const connection = await db.getConnection();
+
   try {
-    const [user] = await db.query(
+    const [user] = await connection.query(
       'select id from users where email = ?',
       email
     );
@@ -33,7 +35,7 @@ exports.signup = async (req, res) => {
 
     const hashPassword = await bcrypt.hash(password, 12);
 
-    const result = await db.query(
+    const result = await connection.query(
       'insert into users (email, full_name, password) values (?, ?, ?)',
       [email, fullName, hashPassword]
     );
@@ -49,8 +51,13 @@ exports.signup = async (req, res) => {
       });
     }
 
+    connection.release();
+
     return res.status(400).send({ error: 'Something went wrong' });
   } catch (err) {
+    if (connection) {
+      connection.release();
+    }
     return res.status(500).send({ error: err.toString() });
   }
 };
@@ -64,8 +71,10 @@ exports.login = async (req, res) => {
   }
   const { email, password } = req.body;
 
+  const connection = await db.getConnection();
+
   try {
-    const [user] = await db.query(
+    const [user] = await connection.query(
       'select id, email, full_name, password from users where email = ?',
       email
     );
@@ -86,6 +95,8 @@ exports.login = async (req, res) => {
 
     const token = jwt.sign({ id: user[0].id }, config.JWT_SECRET);
 
+    connection.release();
+
     return res.status(200).send({
       message: 'User logged in successfully',
       id: user[0].id,
@@ -94,6 +105,9 @@ exports.login = async (req, res) => {
       token,
     });
   } catch (err) {
+    if (connection) {
+      connection.release();
+    }
     return res.status(500).send({ error: err.toString() });
   }
 };
@@ -103,10 +117,15 @@ exports.logout = async (req, res) => {
 };
 
 exports.user = async (req, res) => {
-  const [user] = await db.query(
+  const connection = await db.getConnection();
+
+  const [user] = await connection.query(
     'select id, email, full_name, created_at from users where id = ?',
     req.user.id
   );
+
+  connection.release();
+
   if (user && user[0]) {
     return res.status(200).json({ ...user[0] });
   }
@@ -116,10 +135,14 @@ exports.user = async (req, res) => {
 };
 
 exports.profile = async (req, res) => {
-  const [user] = await db.query(
+  const connection = await db.getConnection();
+
+  const [user] = await connection.query(
     'select id, email, full_name, created_at from users where id = ?',
     req.user.id
   );
+
+  connection.release();
   if (user && user[0]) {
     return res.status(200).json({ ...user[0] });
   }
